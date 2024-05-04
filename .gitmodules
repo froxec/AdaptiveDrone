@@ -1,0 +1,3 @@
+[submodule "docker/ardupilot-sitl-docker"]
+	path = docker/ardupilot-sitl-docker
+	url = https://github.com/AdaptiveDrone/ardupilot-sitl-docker.git
