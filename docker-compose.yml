@@ -1,0 +1,41 @@
+name: ardupilot_software_in_the_loop
+
+services:
+  # autonomous_system:
+  #   build: ./docker/autonomous_system
+  #   image: imgs/autonomous_system
+  #   container_name: autonomous_system
+  #   network_mode: host
+  #   stdin_open: true
+  #   tty: true
+  #   user: rosdev
+  # ardupilot-sitl:
+  #   build: ./docker/ardupilot-sitl-docker
+  #   image: imgs/ardupilot-sitl
+  #   container_name: ardupilot-sitl
+  #   platform: linux/amd64
+  #   stdin_open: true
+  #   tty: true
+  #   user: dockeruser
+  #   ports:
+  #     - 5760:5760
+  ardupilot_gazebo:
+    build: ./docker/ardupilot_gazebo
+    image: imgs/ardupilot_gazebo
+    container_name: ardupilot_gazebo
+    network_mode: host
+    stdin_open: true
+    tty: true
+    environment:
+      - DISPLAY=$DISPLAY
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /dev:/dev
+    deploy:
+      resources:
+          reservations:
+              devices:
+                  - driver: nvidia
+                    count: all
+                    capabilities:
+                      - gpu
