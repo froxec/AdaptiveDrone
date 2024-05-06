@@ -3,11 +3,14 @@
     "remoteUser": "simuser",
     "dockerComposeFile": "${localWorkspaceFolder}/docker-compose.yml",
     "service": "ardupilot_gazebo",
-    "workspaceFolder": "/",
+    "workspaceFolder": "/home/simuser",
     "customizations": {
         "vscode": {
             "extensions": [
-            ]
+            ],
+            "settings": {
+                "remote.autoForwardPorts": false
+              }
         }
     }
 }

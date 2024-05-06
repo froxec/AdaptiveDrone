@@ -26,16 +26,18 @@ services:
     network_mode: host
     stdin_open: true
     tty: true
+    privileged: true
     environment:
       - DISPLAY=$DISPLAY
     volumes:
-      - /tmp/.X11-unix:/tmp/.X11-unix:rw
-      - /dev:/dev
+        - /dev:/dev
+        - /dev/video*:/dev/video*
+        - /tmp/.X11-unix:/tmp/.X11-unix:rw
     deploy:
       resources:
           reservations:
               devices:
                   - driver: nvidia
                     count: all
-                    capabilities:
-                      - gpu
+                    capabilities: [gpu]
+              memory: 12g
