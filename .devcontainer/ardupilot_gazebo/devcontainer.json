@@ -1,0 +1,16 @@
+{
+    "name": "ardupilot_gazebo",
+    "remoteUser": "simuser",
+    "dockerComposeFile": "${localWorkspaceFolder}/docker-compose.yml",
+    "service": "ardupilot_gazebo",
+    "workspaceFolder": "/home/simuser",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+            ],
+            "settings": {
+                "remote.autoForwardPorts": false
+              }
+        }
+    }
+}
