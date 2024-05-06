@@ -124,4 +124,6 @@ ENV NVIDIA_VISIBLE_DEVICES all
 # configure shell
 COPY run_entrypoint.bash /home/${USER}/
 RUN sudo chmod +x /home/${USER}/run_entrypoint.bash
+WORKDIR /home/${USER}
+RUN /home/${USER}/run_entrypoint.bash
 #ENTRYPOINT "/home/${USER}/run_entrypoint.bash"

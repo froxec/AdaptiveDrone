@@ -1,8 +1,8 @@
-FROM ros:humble-ros-base
+FROM ros:humble-ros-base as base
 
 ARG USERNAME=rosdev
-ARG UID=1000
-ARG GID=$UID
+ARG USER_UID=1000
+ARG USER_GID=$USER_UID
 
 # Install some dependencies packages
 RUN apt-get update -q \
@@ -11,6 +11,7 @@ RUN apt-get update -q \
     software-properties-common \
     python3-pip \
     xauth \
+    net-tools \
     && apt clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
@@ -27,11 +28,13 @@ RUN wget https://raw.githubusercontent.com/mavlink/mavros/master/mavros/scripts/
     && chmod a+x install_geographiclib_datasets.sh \ 
     && sudo ./install_geographiclib_datasets.sh
 
-# Create and switch to user
-RUN groupadd -g $GID $USERNAME \
-    && useradd -lm -u $UID -g $USERNAME -s /bin/bash $USERNAME \
-    && echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
-USER $USERNAME
+# Create the non-root user
+RUN groupadd --gid $USER_GID $USERNAME \
+    && useradd --uid $USER_UID -s /bin/bash --gid $USER_GID -m $USERNAME \
+    && apt-get update \
+    && apt-get install -y sudo \
+    && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
+    && chmod 0440 /etc/sudoers.d/$USERNAME
 
 # Create workspace so that user own this directory
 RUN mkdir -p /home/$USERNAME/ros2_ws/src
@@ -40,5 +43,3 @@ WORKDIR /home/$USERNAME/ros2_ws
 # Copy configuration files
 RUN echo 'source /opt/ros/'$ROS_DISTRO'/setup.bash' >> /home/$USERNAME/.bashrc \
     && echo 'source /home/'$USERNAME'/ros2_ws/install/setup.bash' >> /home/$USERNAME/.bashrc
-
-CMD ["bash"]

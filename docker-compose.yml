@@ -1,24 +1,19 @@
 name: ardupilot_software_in_the_loop
 
 services:
-  # autonomous_system:
-  #   build: ./docker/autonomous_system
-  #   image: imgs/autonomous_system
-  #   container_name: autonomous_system
-  #   network_mode: host
-  #   stdin_open: true
-  #   tty: true
-  #   user: rosdev
-  # ardupilot-sitl:
-  #   build: ./docker/ardupilot-sitl-docker
-  #   image: imgs/ardupilot-sitl
-  #   container_name: ardupilot-sitl
-  #   platform: linux/amd64
-  #   stdin_open: true
-  #   tty: true
-  #   user: dockeruser
-  #   ports:
-  #     - 5760:5760
+  autonomous_system:
+    build: ./docker/autonomous_system
+    image: imgs/autonomous_system
+    container_name: autonomous_system
+    network_mode: host
+    stdin_open: true
+    tty: true
+    user: rosdev
+    privileged: true
+    ipc: host
+    pid: host
+    volumes:
+      - /dev:/dev
   ardupilot_gazebo:
     build: ./docker/ardupilot_gazebo
     image: imgs/ardupilot_gazebo
@@ -27,6 +22,8 @@ services:
     stdin_open: true
     tty: true
     privileged: true
+    ipc: host
+    pid: host
     environment:
       - DISPLAY=$DISPLAY
     volumes:

@@ -20,21 +20,11 @@ You have to do this both for ardupilot_gazebo and autonomous_system images.
 
 In ardupilot_gazebo container you have to run both ardupilot and gazebo.
 
-### Configure environment
-
-Firstly configure environment by running:
-```
-./run_entrypoint.sh
-```
-Then reload terminal or run:
-```
-source ~/.bashrc
-```
 
 ### Run ardupilot_sitl
 
 ```
-sim_vehicle.py -v ArduCopter -f gazebo-iris --model JSON --map --console
+sim_vehicle.py -v ArduCopter -f gazebo-iris --model JSON -m "--out udp:localhost:6788"
 ```
 
 ### Run gazebo
@@ -47,3 +37,29 @@ gz sim -v4 -r iris_runway.sdf
 
 Voilà, simulation should be running and you should be seeing gazebo GUI with Iris quadcopter.
 
+### Troubleshooting 
+
+If gazebo doesn't find models run:
+
+Configure environment by running:
+```
+./run_entrypoint.sh
+```
+Then reload terminal or run:
+```
+source ~/.bashrc
+```
+
+## Autonomous system
+
+In autonomous_system container run:
+
+```
+ros2 launch mavros apm.launch fcu_url:=udp://:6788@127.0.0.1
+```
+
+When you look at topics list you should see /mavros/* topics.
+
+```
+ros2 topic list
+```
