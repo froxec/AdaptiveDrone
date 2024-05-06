@@ -67,12 +67,6 @@ RUN wget https://packages.osrfoundation.org/gazebo.gpg -O /usr/share/keyrings/pk
     && apt-get update \
     && apt-get install -y gz-harmonic
 
-# # build gazebo libraries (GARDEN LEGACY)
-# WORKDIR /workspace
-# RUN colcon graph
-# RUN colcon build --merge-install
-
-
 ###########################################
 # Build ardupilot_gazebo for gazebo harmonic
 ###########################################
@@ -128,5 +122,6 @@ RUN ./waf sub
 ENV NVIDIA_DRIVER_CAPABILITIES all
 ENV NVIDIA_VISIBLE_DEVICES all
 # configure shell
-COPY run_entrypoint.sh /
-RUN sudo chmod +x /run_entrypoint.sh
+COPY run_entrypoint.bash /home/${USER}/
+RUN sudo chmod +x /home/${USER}/run_entrypoint.bash
+#ENTRYPOINT "/home/${USER}/run_entrypoint.bash"

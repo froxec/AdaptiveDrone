@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# Source the setup.bash script
-echo 'source /workspace/install/setup.bash' >> ~/.bashrc
-
 # configure gazebo
 echo 'export GZ_SIM_SYSTEM_PLUGIN_PATH=/workspace/ardupilot_gazebo_ws/src/ardupilot_gazebo/build:${GZ_SIM_SYSTEM_PLUGIN_PATH}' >> ~/.bashrc
 echo 'export GZ_SIM_RESOURCE_PATH=/workspace/ardupilot_gazebo_ws/src/ardupilot_gazebo/models:/workspace/ardupilot_gazebo_ws/src/ardupilot_gazebo/worlds:${GZ_SIM_RESOURCE_PATH}' >> ~/.bashrc
