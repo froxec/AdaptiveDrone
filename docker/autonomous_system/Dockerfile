@@ -28,6 +28,13 @@ RUN wget https://raw.githubusercontent.com/mavlink/mavros/master/mavros/scripts/
     && chmod a+x install_geographiclib_datasets.sh \ 
     && sudo ./install_geographiclib_datasets.sh
 
+# Install rqt tools (GUI development)
+RUN apt-get update -q \
+    && apt install -y --no-install-recommends \
+    ros-humble-rqt* \
+    && apt clean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* 
+
 # Create the non-root user
 RUN groupadd --gid $USER_GID $USERNAME \
     && useradd --uid $USER_UID -s /bin/bash --gid $USER_GID -m $USERNAME \
@@ -37,9 +44,10 @@ RUN groupadd --gid $USER_GID $USERNAME \
     && chmod 0440 /etc/sudoers.d/$USERNAME
 
 # Create workspace so that user own this directory
-RUN mkdir -p /home/$USERNAME/ros2_ws/src
-WORKDIR /home/$USERNAME/ros2_ws
+RUN mkdir -p /home/$USERNAME/ws/
+WORKDIR /home/$USERNAME/ws
 
 # Copy configuration files
 RUN echo 'source /opt/ros/'$ROS_DISTRO'/setup.bash' >> /home/$USERNAME/.bashrc \
-    && echo 'source /home/'$USERNAME'/ros2_ws/install/setup.bash' >> /home/$USERNAME/.bashrc
+    && echo 'source /home/'$USERNAME'/ws/install/setup.bash' >> /home/$USERNAME/.bashrc
+RUN chown -R rosdev /home/$USERNAME/ws/

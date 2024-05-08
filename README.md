@@ -63,3 +63,18 @@ When you look at topics list you should see /mavros/* topics.
 ```
 ros2 topic list
 ```
+
+### Interacting with ArduPilot
+
+You can interact with Ardupilot by reading messages from /mavros topics and calling /mavros services.
+
+Important services:
+- /mavros/set_mode -> Setting quadcopter mode -> e.g. custom_mode='GUIDED'
+- /mavros/cmd/arming -> arming command -> True/False
+
+### RQT GUI
+
+For easy gui topic/service development run RQT GUI:
+```
+rqt
+```
