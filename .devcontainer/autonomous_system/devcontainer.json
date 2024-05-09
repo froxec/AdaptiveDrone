@@ -14,6 +14,8 @@
               "redhat.vscode-xml",
               "tamasfe.even-better-toml",
               "yzhang.markdown-all-in-one",
+              "njpwerner.autodocstring",
+              "VisualStudioExptTeam.vscodeintellicode-completions"
           ],
           "settings": {
               "files.associations": {

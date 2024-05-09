@@ -1,0 +1,11 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Ros2 node debug",
+            "type": "ros",
+            "request": "launch",
+            "target": "/home/rosdev/ws/mpc_control/launch/mpc_node_launch.py"
+        },
+    ]
+}
