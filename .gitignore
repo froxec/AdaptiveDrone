@@ -2,3 +2,8 @@
 ws/build
 ws/install
 ws/log
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+ws/mpc_control/launch/__pycache__/mpc_node_launch.cpython-310.pyc
+ws/mpc_control/mpc_control/__pycache__/node_config.cpython-310.pyc
