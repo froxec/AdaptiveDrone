@@ -39,16 +39,25 @@ Voilà, simulation should be running and you should be seeing gazebo GUI with Ir
 
 ### Troubleshooting 
 
-If gazebo doesn't find models run:
+#### Gazebo doesn't find models run
 
 Configure environment by running:
 ```
-./run_entrypoint.sh
+./run_entrypoint.bash
 ```
 Then reload terminal or run:
 ```
 source ~/.bashrc
 ```
+
+#### Gazebo cannot connect to display :0 (Qt.xcb error)
+
+Run the following command on HOST machine:
+
+```
+xhost +local:docker 
+```
+
 
 ## Autonomous system
 
@@ -63,6 +72,33 @@ When you look at topics list you should see /mavros/* topics.
 ```
 ros2 topic list
 ```
+
+### Running node
+
+#### Debug mode
+
+Build package
+```
+colcon build --cmake-args -DCMAKE_BUILD_TYPE=Debug
+```
+Then use visual studio code with launch configuration:
+```
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Ros2 node debug",
+            "type": "ros",
+            "request": "launch",
+            "target": "/home/rosdev/ws/mpc_control/launch/mpc_node_launch.py"
+        },
+    ]
+}
+```
+
+#### Troubleshooting
+
+If colcon build throws stderr SetuptoolsDeprecationWarning then you should downgrade setuptools as described [HERE](https://answers.ros.org/question/396439/setuptoolsdeprecationwarning-setuppy-install-is-deprecated-use-build-and-pip-and-other-standards-based-tools/).
 
 ### Interacting with ArduPilot
 

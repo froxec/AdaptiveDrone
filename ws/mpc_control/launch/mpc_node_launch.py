@@ -6,7 +6,8 @@ def generate_launch_description():
         Node(
             package='mpc_control',
             executable='mpc_node',
-            namespace="control",
-            name="controller"
+            name='mpc_controller',
+            namespace='',
+            output='screen'
         )
     ])

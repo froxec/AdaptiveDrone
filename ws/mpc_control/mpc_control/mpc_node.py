@@ -3,21 +3,16 @@ import rclpy.client
 from rclpy.node import Node
 from rclpy.logging import LoggingSeverity
 from mavros_msgs.srv import SetMode, CommandBool, CommandTOL
-from typing import TypedDict, List, Dict
+from mavros_msgs.msg import State
+from typing import TypedDict, Dict, Type
 from typing import Any
-from enum import Enum
-
+import time
 import rclpy.publisher
 import rclpy.service
 import rclpy.subscription
 
-class FlightMode(Enum):
-    """
-    Enum for ArduCopter flight modes.
-    """
-    GUIDED = "GUIDED"
-    LAND = "LAND"
-    STABILIZE = "STABILIZE"
+from mpc_control.flight_mode import FlightMode
+from mpc_control.callbacks import CallbackHandler
     
 class ServiceDict(TypedDict):
     client: rclpy.client.Client
@@ -29,12 +24,17 @@ class PublisherDict(TypedDict):
 
 class SubscriberDict(TypedDict):
     sub: rclpy.subscription.Subscription
+    callback_handler: CallbackHandler
     msg_type: Any
 
 class CustomNode(Node):
-    # code for implementing abstract node with specific set of service clients
-    # add json config file support 
-
+    """ CustomNode class represents ROS nodes Python proxy. This class is used to encapsulate publishers, \
+    subscribes and services which define a specific node. Node configuration is passed as a dict. For the dict template look at \
+    node_config.py.
+    Args:
+        node_name (string) -> node name
+        node_config_dict (dict) -> configuration dict
+    """
     def __init__(self, node_name, node_config_dict):
         Node.__init__(self, node_name)
         self.service_clients : Dict[str, ServiceDict]  ={}
@@ -59,9 +59,11 @@ class CustomNode(Node):
     def get_pub(self, name : str) -> PublisherDict:
         return self.pubs[name]
 
-    def _create_sub(self,  name : str, callback_function, type, topic : str, qos_profile : int = 10):
-        sub = self.create_subscription(type, topic, callback_function, qos_profile)
-        sub_dict = SubscriberDict(sub=sub, msg_type=type)
+    def _create_sub(self,  name : str, callback_handler_class : Type[CallbackHandler], type, topic : str, qos_profile : int = 10):
+        # instantiate callback handler
+        callback_handler = callback_handler_class()
+        sub = self.create_subscription(type, topic, callback_handler.callback, qos_profile)
+        sub_dict = SubscriberDict(sub=sub, msg_type=type, callback_handler=callback_handler)
         self.subs[name] = sub_dict
 
     def get_sub(self, name : str) -> SubscriberDict:
@@ -91,22 +93,47 @@ class CustomNode(Node):
     def _initialize_subscribers(self, subscribers : list):
         for subscriber in subscribers:
             self._create_sub(name=subscriber["name"],
-                            callback_function=subscriber["callback"],
+                            callback_handler_class=subscriber["callback_handler_class"],
                             type=subscriber["type"],
                             topic=subscriber["topic"],
                             qos_profile=subscriber["qos_profile"])
 
 class ArduCopterManager:
-
+    """
+    ArduCopterManager class is used to manage ArduCopter. 
+    """
     def __init__(self, mavros_node : CustomNode) -> None:
         assert isinstance(mavros_node, CustomNode)
         self._mavros_node = mavros_node
+        # state variables
         self._armed : bool = False
+        self._connected : bool = False
+        self._is_guided : bool = False
+        self._is_manual : bool = False
         self._mode : FlightMode = FlightMode.STABILIZE
+        self._ardupilot_state : State = None
+        #self.initialize_properties()
 
-    def initialize_properties(self):
-        # check for default properties (by subscriptions)
-        pass
+    def update_properties(self) -> bool:
+        if self._mavros_node.subs["ardupilot_state"]["callback_handler"].last_message is not None:
+            self._armed = self._mavros_node.subs["ardupilot_state"]["callback_handler"].armed
+            self._connected = self._mavros_node.subs["ardupilot_state"]["callback_handler"].connected
+            self._is_guided = self._mavros_node.subs["ardupilot_state"]["callback_handler"].guided
+            self._is_manual = self._mavros_node.subs["ardupilot_state"]["callback_handler"].manual_input
+            self._mode = self._mavros_node.subs["ardupilot_state"]["callback_handler"].mode
+            return True
+        else:
+            print("HALO")
+            #self._mavros_node.get_logger().log("[Copter Manager]: State not initialized yet.")
+            return False
+
+    def initialize_properties(self) -> None:
+        while True:
+            if self.update_properties():
+                #self._mavros_node.get_logger().log("[Copter Manager]: State request successful.")
+                break
+            time.sleep(1.0)
+
 
     @property
     def armed(self) -> bool:
@@ -196,8 +223,9 @@ class Controller(CustomNode):
 
 
 def main(args=None):
-    from .node_config import node_config
+    from mpc_control.node_config import node_config
     rclpy.init(args=args)
+    print("hal..")
     controller_node = Controller(node_config)
 
     rclpy.spin(controller_node)
